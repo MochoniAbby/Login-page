@@ -1,12 +1,11 @@
 
 @import url('https://fonts.googleapis.com/css?family=Poppins');
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: 'Poppins' ,sans-serif;
-
-
 } 
 section{
     display:flex;
@@ -14,7 +13,7 @@ section{
     align-items: center;
     width: 100%;
     height: 100vh;
-    background: url('abm.jpg') no-repeat;
+    background: url('/static/abm.jpg') no-repeat;
     background-size: cover;
     background-position: center;
 } 
