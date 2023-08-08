@@ -6,4 +6,5 @@ CREATE TABLE student (
     pass_word TEXT NOT NULL
 );*/
 
-INSERT INTO student (username, pass_word) VALUES ('Abby', 'moraa');
+/*INSERT INTO student (username, pass_word) VALUES ('Abby', 'moraa');*/
+/*ALTER TABLE student ADD email VARCHAR(255);*/

@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for
 from flask_bcrypt import Bcrypt
 import sqlite3
 
@@ -17,6 +17,10 @@ def get_db_conn():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
     return conn
+
+@app.route('/index.html')
+def redirecting():
+    return redirect(url_for('login'))
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -41,7 +45,9 @@ def login():
                         return render_template('welcome.html')
                     else:
                         print("Wrong password")
-                        
+                else:
+                    return "Username not found"
+
             except sqlite3.Error as error:
                 print('Error occured - ', error)
 
@@ -50,6 +56,10 @@ def login():
                 conn.close()
 
     return render_template("index.html")
-            
+
+@app.route('/register', methods = ["GET", "POST"])
+def registration():
+    return render_template("registration.html")
+
 if __name__ == '__main__':
     app.run(debug=True)
