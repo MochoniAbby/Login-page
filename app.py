@@ -17,8 +17,9 @@ def hash_password(password):
     return bcrypt.generate_password_hash(password).decode('utf-8')
 
 #Comparing the hashed password and the one in the database
+#Password to compare comes second. This prevents 'Invalid salt' error
 def verify_password(password, hashed_password):
-    return bcrypt.check_password_hash(password, hashed_password.encode('utf-8'))
+    return bcrypt.check_password_hash(hashed_password, password)
 
 #Establishing connection to SQLite3 database
 def get_db_conn():
@@ -51,7 +52,7 @@ def login():
 
                 if row:
                     passcode = row['pass_word']
-                    if password == passcode:
+                    if verify_password(password, passcode.encode('utf-8')):
                         return render_template('welcome.html')
                     else:
                         print("Wrong password")
