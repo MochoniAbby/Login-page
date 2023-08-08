@@ -13,30 +13,43 @@ def hash_password(password):
 def verify_password(password, hashed_password):
     return bcrypt.check_password_hash(password, hashed_password.encode('utf-8'))
 
+def get_db_conn():
+    conn = sqlite3.connect('database.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
 
-        try:
-            conn = sqlite3.connect('database.db')
-            cur = conn.cursor()
-            query = "SELECT username, pass_word FROM student where name = ?;"
-            cur.execute(query, (username, ))
+        if username == '' or password == '':
+            print("Missing details")
+        else:
+            conn = get_db_conn()
 
-            if password == password:
-                return render_template('welcome.html')
-            
-        except sqlite3.Error as error:
-            print('Error occurred - ', error)
+            try:
+                cur = conn.cursor()
+                query = "SELECT pass_word FROM student WHERE username = ?;"
+                result = cur.execute(query, (username, ))
+                row = result.fetchone()
 
-        finally:
-            cur.close()
-            conn.close()
-    
+                if row:
+                    passcode = row['pass_word']
+                    if password == passcode:
+                        return render_template('welcome.html')
+                    else:
+                        print("Wrong password")
+                        
+            except sqlite3.Error as error:
+                print('Error occured - ', error)
+
+            finally:
+                cur.close()
+                conn.close()
+
     return render_template("index.html")
             
-
 if __name__ == '__main__':
     app.run(debug=True)
