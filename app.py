@@ -35,12 +35,14 @@ def redirecting():
 #Login route
 @app.route('/', methods=['GET', 'POST'])
 def login():
+    error = None
+    
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
 
         if username == '' or password == '':
-            print("Missing details")
+            error = "Missing details. Enter details"
         else:
             conn = get_db_conn()
 
@@ -55,25 +57,28 @@ def login():
                     if verify_password(password, passcode.encode('utf-8')):
                         return render_template('welcome.html')
                     else:
-                        print("Wrong password")
+                        error = "Either username or password is incorrect. Please try again!"
                 else:
                     return "Username not found"
 
-            except sqlite3.Error as error:
-                print('Error occured - ', error)
+            except sqlite3.Error as e:
+                error = "Database error: {}".format(str(e))
 
             finally:
                 cur.close()
                 conn.close()
 
-    return render_template("index.html")
+    return render_template("index.html", error=error)
 
 @app.route('/register', methods = ["GET", "POST"])
 def registration():
+    error = None
+    
     if request.method == 'POST':
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
+        otp_code = request.form.get('otp_code')
 
         if username == '' or password == '' or email == '':
             print("Missing details")
@@ -87,23 +92,26 @@ def registration():
                 existing_user = count.fetchone()[0]
 
                 if existing_user > 0:
-                    print("Username already exists. Try a different username.")
+                    error = "Username already exists. Try a different username."
                 else:
                     code = generate_otp()
                     hashed_password = hash_password(password)
                     update_query = "INSERT INTO student (username, email, pass_word, otp_code) VALUES (?, ?, ?, ?);"
                     cur.execute(update_query, (username, email, hashed_password, code))
                     conn.commit()
-                    return render_template('index.html')
+                    error = "Your OTP code is {}".format(code)
+                    
+                    if password == code:
+                        return render_template('index.html')
             
-            except sqlite3.Error as error:
-                print("Database Error - ", error)
+            except sqlite3.Error as e:
+                error = "Database Error: {}".format(str(e))
 
             finally:
                 cur.close()
                 conn.close()
 
-    return render_template("registration.html")
+    return render_template("registration.html", error=error)
 
 if __name__ == '__main__':
     app.run(debug=True)

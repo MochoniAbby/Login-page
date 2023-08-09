@@ -49,6 +49,11 @@
         <div class="Register-link" style="margin: 12px 0 0 30px;">
             <p>Already have an account? <a href="/" style="color: white;">Login</a></p>
         </div>
+        <hr style="width: 80%; margin: auto; margin-top: 12px; margin-bottom: 12px;">
+        {% if error %}
+        <input type="text" name="otp_code">
+        <p><strong>Error:</strong> {{error}}</p>
+        {% endif %}
         </form>
     </section> 
             <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
