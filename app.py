@@ -40,6 +40,7 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        otp = request.form.get('otp_code')
 
         if username == '' or password == '':
             error = "Missing details. Enter details"
@@ -48,16 +49,25 @@ def login():
 
             try:
                 cur = conn.cursor()
-                query = "SELECT pass_word FROM student WHERE username = ?;"
+                query = "SELECT pass_word, otp_code FROM student WHERE username = ?;"
                 result = cur.execute(query, (username, ))
                 row = result.fetchone()
 
                 if row:
                     passcode = row['pass_word']
+                    otp_code = row['otp_code']
+                    
                     if verify_password(password, passcode.encode('utf-8')):
                         return render_template('welcome.html')
+                        
+                    elif password == otp_code:
+                        return render_template('welcome.html')
                     else:
-                        error = "Either username or password is incorrect. Please try again!"
+                        code = generate_otp()
+                        update_query = "UPDATE student SET otp_code = ? WHERE username = ?;"
+                        cur.execute(update_query, (code, username))
+                        conn.commit()
+                        error = "Either username or password is incorrect. Your OTP code is {}".format(code)
                 else:
                     return "Username not found"
 
@@ -78,7 +88,6 @@ def registration():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
-        otp_code = request.form.get('otp_code')
 
         if username == '' or password == '' or email == '':
             print("Missing details")
@@ -100,9 +109,6 @@ def registration():
                     cur.execute(update_query, (username, email, hashed_password, code))
                     conn.commit()
                     error = "Your OTP code is {}".format(code)
-                    
-                    if password == code:
-                        return render_template('index.html')
             
             except sqlite3.Error as e:
                 error = "Database Error: {}".format(str(e))

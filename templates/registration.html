@@ -42,6 +42,12 @@
             <!--<label><input type="checkbox"> Remember me</label>-->
             <!--<a href="#" style="color: white;">Forgot Password</a>-->
         </div>
+
+        <!--<div class="verify" style="display: flex; justify-content: space-between; margin: 10px 0 10px 0">
+            <input type="text" name="otp_code" style="margin-left: 30px;">
+            <button value="Get OTP" style="margin-right: 30px; padding: 5px; border: none; border-radius: 10px;">Get OTP</button>
+        </div>-->
+
         <input type="submit" style="width: 75%; margin: 0 50px 0 50px; padding: 10px;
                                      background-color: white; border-radius: 20px; 
                                      border: none; font-size: 15px; font-weight: 700;
@@ -49,9 +55,8 @@
         <div class="Register-link" style="margin: 12px 0 0 30px;">
             <p>Already have an account? <a href="/" style="color: white;">Login</a></p>
         </div>
-        <hr style="width: 80%; margin: auto; margin-top: 12px; margin-bottom: 12px;">
         {% if error %}
-        <input type="text" name="otp_code">
+        <hr style="width: 80%; margin: auto; margin-top: 12px; margin-bottom: 12px;">
         <p><strong>Error:</strong> {{error}}</p>
         {% endif %}
         </form>
