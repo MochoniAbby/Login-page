@@ -1,8 +1,10 @@
+#importing libraries
 from flask import Flask, request, render_template, redirect, url_for
 from flask_bcrypt import Bcrypt
 import sqlite3
 import random; import string
 
+#Initializing application
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
@@ -37,14 +39,15 @@ def redirecting():
 def login():
     error = None
     
+    #Acquiring input taken from the form
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        otp = request.form.get('otp_code')
 
         if username == '' or password == '':
             error = "Missing details. Enter details"
         else:
+            #connecting to the database then do exception handling for connection operations(try.. except.. finally)
             conn = get_db_conn()
 
             try:
@@ -80,35 +83,38 @@ def login():
 
     return render_template("index.html", error=error)
 
+#Registration route (methods are almost the same as those above)
 @app.route('/register', methods = ["GET", "POST"])
 def registration():
     error = None
     
+    #Acquiring input taken from the form
     if request.method == 'POST':
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
 
         if username == '' or password == '' or email == '':
-            print("Missing details")
+            error = "Missing details. Input missing details"
         else:
-            conn = get_db_conn()
-
+            conn = get_db_conn()    #connecting to the database
+            
+            #Exception handling for database operations
             try:
                 cur = conn.cursor()
                 query = "SELECT COUNT(*) FROM student WHERE username = ?;"
                 count = cur.execute(query, (username,)) 
-                existing_user = count.fetchone()[0]
+                existing_user_count = count.fetchone()[0]
 
-                if existing_user > 0:
+                if existing_user_count > 0:
                     error = "Username already exists. Try a different username."
                 else:
+                    #generating code and updating to the database for easy login using the code
                     code = generate_otp()
                     hashed_password = hash_password(password)
                     update_query = "INSERT INTO student (username, email, pass_word, otp_code) VALUES (?, ?, ?, ?);"
                     cur.execute(update_query, (username, email, hashed_password, code))
                     conn.commit()
-                    error = "Your OTP code is {}".format(code)
             
             except sqlite3.Error as e:
                 error = "Database Error: {}".format(str(e))
