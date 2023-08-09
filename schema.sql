@@ -6,4 +6,4 @@
     pass_word TEXT NOT NULL
 );*/
 
--- DELETE FROM student WHERE username = "Chris";
+ DELETE FROM student WHERE username = "Light";
